@@ -1,0 +1,1 @@
+import '../node_modules/paper/dist/paper-full.min.js'

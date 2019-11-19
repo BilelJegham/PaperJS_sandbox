@@ -1,0 +1,17 @@
+
+
+
+actor Marguerite
+
+
+
+Marguerite --> (Observer le tableau)
+
+
+Marguerite  --> (Accéder à ses données) : "scanner le tableau"
+
+(Accéder à ses données) <-- (Observer l'objectif)
+
+(Observer le tableau) <-- (Affiche les formes à un instant t)
+
+(Observer le tableau) <.. (Récuperer les données de la famille) : <<includes>>

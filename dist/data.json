@@ -1,0 +1,35 @@
+{
+    "number":4,
+    "lastUpdate": 2,
+    "data": [
+        {
+            "name": "Michel",
+            "km": 10000,
+            "multi": 10,
+            "time": 20
+        },
+        {
+            "name": "Marie",
+            "km": 10000,
+            "multi": 10,
+            "time": 20
+        },
+        {
+            "name": "Lucie",
+            "km": 10000,
+            "multi": 10,
+            "time": 20
+        },
+        {
+            "name": "Martine",
+            "km": 10000,
+            "multi": 10,
+            "time": 20
+        }
+    ],
+    "objectif": {
+        "km": 10000,
+        "multi": 40,
+        "time": 20        
+    }
+}
