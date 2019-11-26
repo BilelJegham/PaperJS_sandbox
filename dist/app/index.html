@@ -1,11 +1,147 @@
 <!DOCTYPE html>
 <html>
     <head>
-
+      <meta charset="utf-8" />
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     </head>
     <body>
 <script src="https://apis.google.com/js/api.js"></script>
 <script>
+  function getMonday(d) {
+    d = new Date(d);
+    d.setHours(0);
+    d.setMinutes(0);
+    d.setSeconds(0);
+    d.setMilliseconds(0);
+    var day = d.getDay(),
+        diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
+    return new Date(d.setDate(diff));
+  }
+  function msToTime(s) {
+  var ms = s % 1000;
+  s = (s - ms) / 1000;
+  var secs = s % 60;
+  s = (s - secs) / 60;
+  var mins = s % 60;
+  var hrs = (s - mins) / 60;
+
+  return hrs + ':' + mins + ':' + secs + '.' + ms;
+}
+const ACTIVITY = [
+ "In vehicle",
+ "Biking",
+ "On foot",
+ "Still (not moving)",
+ "Unknown (unable to detect activity)",
+ "Tilting (sudden device gravity change)",
+ null,
+ "Walking",
+ "Running",
+ "Aerobics",
+ "Badminton",
+ "Baseball",
+ "Basketball",
+ "Biathlon",
+ "Handbiking",
+ "Mountain biking",
+ "Road biking",
+ "Spinning",
+ "Stationary biking",
+ "Utility biking",
+ "Boxing",
+ "Calisthenics",
+ "Circuit training",
+ "Cricket",
+ "Dancing",
+ "Elliptical",
+ "Fencing",
+ "Football (American)",
+ "Football (Australian)",
+ "Football (Soccer)",
+ "Frisbee",
+ "Gardening",
+ "Golf",
+ "Gymnastics",
+ "Handball",
+ "Hiking",
+ "Hockey",
+ "Horseback riding",
+ "Housework",
+ "Jumping rope",
+ "Kayaking",
+ "Kettlebell training",
+ "Kickboxing",
+ "Kitesurfing",
+ "Martial arts",
+ "Meditation",
+ "Mixed martial arts",
+ "P90X exercises",
+ "Paragliding",
+ "Pilates",
+ "Polo",
+ "Racquetball",
+ "Rock climbing",
+ "Rowing",
+ "Rowing machine",
+ "Rugby",
+ "Jogging",
+ "Running on sand",
+ "Running (treadmill)",
+ "Sailing",
+ "Scuba diving",
+ "Skateboarding",
+ "Skating",
+ "Cross skating",
+ "Inline skating (rollerblading)",
+ "Skiing",
+ "Back-country skiing",
+ "Cross-country skiing",
+ "Downhill skiing",
+ "Kite skiing",
+ "Roller skiing",
+ "Sledding",
+ "Sleeping",
+ "Snowboarding",
+ "Snowmobile",
+ "Snowshoeing",
+ "Squash",
+ "Stair climbing",
+ "Stair-climbing machine",
+ "Stand-up paddleboarding",
+ "Strength training",
+ "Surfing",
+ "Swimming",
+ "Swimming (swimming pool)",
+ "Swimming (open water)",
+ "Table tennis (ping pong)",
+ "Team sports",
+ "Tennis",
+ "Treadmill (walking or running)",
+ "Volleyball",
+ "Volleyball (beach)",
+ "Volleyball (indoor)",
+ "Wakeboarding",
+ "Walking (fitness)",
+ "Nording walking",
+ "Walking (treadmill)",
+ "Waterpolo",
+ "Weightlifting",
+ "Wheelchair",
+ "Windsurfing",
+ "Yoga",
+ "Zumba",
+ "Diving",
+ "Ergometer",
+ "Ice skating",
+ "Indoor skating",
+ "Curling",
+ null,
+ "Other (unclassified fitness activity)",
+ "Light sleep",
+ "Deep sleep",
+ "REM sleep",
+ "Awake (during sleep cycle)"
+]
   /**
    * Sample JavaScript code for fitness.users.dataSources.get
    * See instructions for running APIs Explorer code samples locally:
@@ -17,28 +153,68 @@
         .signIn({scope: "https://www.googleapis.com/auth/fitness.activity.read https://www.googleapis.com/auth/fitness.activity.write https://www.googleapis.com/auth/fitness.blood_glucose.read https://www.googleapis.com/auth/fitness.blood_glucose.write https://www.googleapis.com/auth/fitness.blood_pressure.read https://www.googleapis.com/auth/fitness.blood_pressure.write https://www.googleapis.com/auth/fitness.body.read https://www.googleapis.com/auth/fitness.body.write https://www.googleapis.com/auth/fitness.body_temperature.read https://www.googleapis.com/auth/fitness.body_temperature.write https://www.googleapis.com/auth/fitness.location.read https://www.googleapis.com/auth/fitness.location.write https://www.googleapis.com/auth/fitness.nutrition.read https://www.googleapis.com/auth/fitness.nutrition.write https://www.googleapis.com/auth/fitness.oxygen_saturation.read https://www.googleapis.com/auth/fitness.oxygen_saturation.write https://www.googleapis.com/auth/fitness.reproductive_health.read https://www.googleapis.com/auth/fitness.reproductive_health.write"})
         .then(function() { console.log("Sign-in successful"); },
               function(err) { console.error("Error signing in", err); });
+              
   }
   function loadClient() {
-    gapi.client.setApiKey("AIzaSyAjnRDBhB1ziDLhtv8vuf-OD6_NB_uTKPE");
-    return gapi.client.load("https://content.googleapis.com/discovery/v1/apis/fitness/v1/rest")
-        .then(function() { console.log("GAPI client loaded for API"); },
-              function(err) { console.error("Error loading GAPI client for API", err); });
+      gapi.client.setApiKey("AIzaSyAjnRDBhB1ziDLhtv8vuf-OD6_NB_uTKPE");
+      return gapi.client.load("https://content.googleapis.com/discovery/v1/apis/fitness/v1/rest")
+          .then(function() { console.log("GAPI client loaded for API"); execute();},
+                function(err) { console.error("Error loading GAPI client for API", err); });
+        
   }
   // Make sure the client is loaded and sign-in is complete before calling this method.
   function execute() {
-    return gapi.client.fitness.users.dataset.aggregate({
+    gapi.client.fitness.users.dataset.aggregate({
       "userId": "me",
       "resource": {
-        "startTimeMillis": 1574181600000,
-        "endTimeMillis": 1574182560000,
+        "startTimeMillis":getMonday(new Date()).getTime(),
+        "endTimeMillis": new Date().getTime(),
+        "aggregateBy": [
+          {
+            "dataTypeName": "com.google.activity.segment"
+          },
+        ],
+        "bucketByTime": {
+          "period": {
+            "type": "week",
+            "value": 1,
+            "timeZoneId": "UTC"
+          }
+        }
+      }
+    }).then(function(response) {
+                // Handle the results here (response.result has the parsed body).
+                console.log("Response Segmeent", response);
+
+        response.result.bucket[0].dataset[0].point.forEach(element => {
+          let div= document.createElement('div');
+          console.log(element)
+
+         // div.innerHTML = "<b>"+(new Date(Math.ceil(element.startTimeNanos/1000000))).toLocaleString() +" à "+(new Date(Math.ceil(element.endTimeNanos/1000000))).toLocaleString() +"</b> : ";
+          div.innerHTML += ACTIVITY[element.value[0].intVal] +" : "+ msToTime(element.value[1].intVal) +" en "+element.value[2].intVal+" fois";
+          
+          document.getElementById("activity").appendChild(div)
+          
+        });
+                
+              
+      },
+      function(err) { console.error("Execute error", err); }
+    );
+
+    gapi.client.fitness.users.dataset.aggregate({
+      "userId": "me",
+      "resource": {
+        "startTimeMillis": getMonday(new Date()).getTime(),
+        "endTimeMillis": new Date().getTime(),
         "aggregateBy": [
           {
             "dataTypeName": "com.google.step_count.delta",
             "dataSourceId": "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
           },
           {
-            "dataTypeName": "com.google.weight.summary",
-            "dataSourceId": "derived:com.google.weight:com.google.android.gms:merge_weight"
+            "dataTypeName": "com.google.active_minutes",
+            "dataSourceId": "derived:com.google.active_minutes:com.google.android.gms:merge_active_minutes"
           },
           {
             "dataTypeName": "com.google.distance.delta",
@@ -52,18 +228,34 @@
     }).then(function(response) {
                 // Handle the results here (response.result has the parsed body).
                 console.log("Response", response);
-              },
-              function(err) { console.error("Execute error", err); });
+                
+                response.result.bucket[0].dataset.forEach(e => {
+                  if(e.dataSourceId === "derived:com.google.step_count.delta:com.google.android.gms:aggregated"){
+                    document.getElementById("stepSpan").innerHTML  = e.point[0].value[0].intVal
+                  } else if(e.dataSourceId === "derived:com.google.distance.delta:com.google.android.gms:aggregated"){
+                    document.getElementById("distanceSpan").innerHTML= e.point[0].value[0].fpVal.toFixed(1)
+                  }  else if(e.dataSourceId === "derived:com.google.active_minutes:com.google.android.gms:aggregated"){
+                    document.getElementById("minuteSpan").innerHTML= e.point[0].value[0].intVal
+                  }                 
+                });
+      },
+      function(err) { console.error("Execute error", err); }
+    );
   }
   window.gapi.load("client:auth2", function() {
     gapi.auth2.init({client_id: "813519686956-ctpsg9qqvfn26naikme79o4fbupptfg6.apps.googleusercontent.com"});
-
-    console.log("init")
   });
 </script>
 
-  <button onclick="authenticate().then(loadClient)">authorize and load</button>
-  <button onclick="execute()">execute</button>
+  <button id="btnAuth" class="btn btn-primary" onclick="authenticate().then(loadClient)">Se connecter</button>
+  <p><span id="stepSpan"></span> pas</p>
+  <p><span id="distanceSpan"></span> m</p>
+  <p><span id="minuteSpan"></span> minutes</p>
+
+  <hr/>
+  <div id="activity">
+
+  </div>
 </body>
 
 </html>
