@@ -247,14 +247,17 @@ const ACTIVITY = [
     gapi.auth2.init({client_id: "813519686956-ctpsg9qqvfn26naikme79o4fbupptfg6.apps.googleusercontent.com"});
   });
 </script>
-
-  <button id="btnAuth" class="btn btn-primary" onclick="authenticate().then(loadClient)">Se connecter</button>
+<div class="container">
+  <div class="row">
+    <button id="btnAuth" class="btn btn-primary m-auto" onclick="authenticate().then(loadClient)">Se connecter</button>
+  </div>
+  
   <p><span id="stepSpan"></span> pas</p>
   <p><span id="distanceSpan"></span> m</p>
   <p><span id="minuteSpan"></span> minutes</p>
-
+</div>
   <hr/>
-  <div id="activity">
+  <div id="activity" class="container">
 
   </div>
 </body>
