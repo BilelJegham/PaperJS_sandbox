@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<style>
+			html, body, canvas{
+				width: 100%;
+				height: 100%;
+			}
+			
+		</style>
+		<script type="text/javascript" src="./paper-full.js"></script>
+			<script type="text/javascript" >
+			
+			function Wave(){
+	
+	
+				this.color = '#C9B2A4';
+	this.amount = 20;
+	this.height = 20;
+	this.offsetX = paper.view.size.height-500;
+	this.waveSpeed = -1;
+	this.selected = false;
+	this._path = new paper.Path({ fillColor: this.color });
+	
+	this.init = function(){
+		
+		this._path.fillColor = this.color;
+		this._path.selected = this.selected;
+		
+		this._path.segments = [];
+		this._path.add(new paper.Point(0, paper.view.size.height));
+		this._path.add(new paper.Point(0, paper.view.size.height));
+		for(var i = 0; i <= this.amount; i++){
+			this._path.add(new paper.Point((i / this.amount)* paper.view.size.width, 1* paper.view.size.height) );
+		}
+		this._path.add(new paper.Point(paper.view.size.width, paper.view.size.height));
+		
+	}
+	
+	this.update = function(){
+		var w_sinus = (Math.sin(20/100) + 1) * paper.view.size.width;
+		
+		// Loop through every secound point of the path to make waves:
+		for (var i = 1; i <= this.amount+2; i = i+2){
+			var segment = this._path.segments[i];
+			// Make a sinus wave
+			var sinus = Math.sin(20 * this.waveSpeed + i);
+			// Change the y position of the point:
+			if(this.waveSpeed ==-1)
+			    segment.point.y= this.height
+			else
+			    segment.point.y = sinus * this.height + (this.height * 2);
+
+		}
+		
+		// Same as over (but on the "left over" segments) to make it look more random
+		for (var i = 2; i <= this.amount+2; i = i+2){
+			var segment = this._path.segments[i];
+			var sinus = Math.sin(20 * (this.waveSpeed * .8) + i);
+			if(this.waveSpeed ==-1)
+			    segment.point.y= this.height
+			else
+			    segment.point.y = sinus * this.height + (this.height * 2);
+		}
+		
+		// Water "tide" (makes alle the waves go up and down):
+		for(var i = 1; i <= this.amount+2; i++){
+			this._path.segments[i].point.y += w_sinus/30 + this.offsetX;
+		}
+		
+		// Smooth the waves:
+		this._path.smooth({ from: 2, to: this.amount+2 });
+		
+	}
+	
+}
+	
+
+			window.onload = function() {
+				function createProgress(radius, center, ratio) {
+	var start = new paper.Point({
+		length: radius,
+		angle: -90
+	});
+	var middle = start.rotate(360 * ratio / 2);
+	
+	var end = start.rotate(360 * ratio);
+	var path = new paper.Path({
+	    	strokeWidth: 20,
+	        strokeCap: 'round'
+	});
+	
+	path.add(new paper.Point(center.x+ start.x, center.y+start.y));
+	path.arcTo(new paper.Point(center.x+ middle.x, center.y+middle.y), new paper.Point(center.x+ end.x, center.y+end.y));
+	return path;
+}
+				var canvas = document.getElementById('myCanvas');
+				
+				paper.setup(canvas);
+				//paper.view.size = new paper.Size(window.innerWidth,window.innerHeight)
+
+
+				var data = null
+				var objectif = null
+
+					
+						const  view = paper.view;
+
+
+
+var path1 = new Wave();
+path1.init();
+path1.update();	
+var square = new paper.Path.Rectangle({
+    position:paper.view.viewSize,
+    size: 200,
+    fillColor: '#101234',
+});	
+
+var positionCircle = new paper.Point(paper.view.viewSize.width,paper.view.viewSize.height); 
+var outer = new paper.Path.Circle({
+    center: positionCircle,
+    radius: 140,
+    fillColor: '#2D3B7C'
+});
+var inner = new paper.Path.Circle({
+    center: positionCircle,
+    radius: 100,
+    fillColor: 'white'
+});
+var ring = outer.subtract(inner);
+
+
+var intersect =square.intersect(inner);
+square.rotate(45);
+var progress =createProgress(170, positionCircle, 0.9999);
+progress.strokeColor= '#C7CAD8';
+// console.log(progress)
+var progress1 =createProgress(170, positionCircle, 0);
+progress1.strokeColor= '#868BB9';	
+	
+				paper.view.onFrame = function(event) {
+				}
+var lastUpdate =-1;
+				setInterval(function(){
+					fetch('data2.json', {
+							method: 'GET'
+						}).then(function(response){
+							return response.json()
+						}).then(function(json){
+							var data = json["data"];
+							console.log(lastUpdate)
+							if(lastUpdate != json["lastUpdate"]){
+								lastUpdate = json["lastUpdate"]
+								square.position = new paper.Point(paper.view.viewSize.width-data["nombreAct"],paper.view.viewSize.height);
+								
+								
+								square.scale(data["distance"]);
+							
+
+								intersect.remove()
+								intersect = square.intersect(inner);
+								
+								positionCircle = new paper.Point(paper.view.viewSize.width-data["temps"],paper.view.viewSize.height-data["temps"]);
+								console.log(positionCircle);
+								progress.remove()
+								progress =createProgress(170, positionCircle, 0.9999);
+								progress.strokeColor= '#C7CAD8';
+								
+								progress1.remove()
+								// console.log(progress)
+								progress1 =createProgress(170, positionCircle, data["calories"]);
+								progress1.strokeColor= '#868BB9';	
+								inner.position = positionCircle;
+								outer.position = positionCircle;
+								
+								ring.remove()
+								ring = outer.subtract(inner);
+
+								path1.offsetX = paper.view.viewSize.height-data["denivele"];
+								path1.waveSpeed = data["nombreAct"] ;
+								path1.update();	
+							}
+						}).catch ((error)=> {
+							console.error('Error:', error);
+						});	
+					},500)
+			}
+
+
+		</script>
+    </head>
+  
+
+
+<body>
+	<canvas id="myCanvas"resize></canvas>
+</body>
+</html>
