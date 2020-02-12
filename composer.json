@@ -1,5 +1,5 @@
 {
-    "name": "Test",
-    "description": "This is a very cool package!",
-    "license": "MIT",
+    "require": {
+        "monolog/monolog": "1.0.*"
+    }
 }
